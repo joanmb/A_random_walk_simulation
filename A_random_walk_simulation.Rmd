@@ -1,0 +1,34 @@
+---
+title: "A random walk simulation"
+output: html_notebook
+---
+
+
+
+```{r}
+RW<-function(p = 0.5, n = 100, S0 = 0){
+    X <- rbinom(n, 1, p)
+    X <- X - 1 * (X == 0)
+    S <- cumsum(c(S0, X))
+    return(data.frame(n = 0:n, S = S))
+}
+```
+
+
+```{r}
+library(ggplot2)
+
+df <- RW(n = 200)
+
+bound <- max(abs(max(df[2])), abs(min(df[2]))) # In order to center the drawing
+    
+g<- ggplot(df, aes(n, S)) +
+    geom_point(size = 0.5, colour = 'blue') +
+    ylim(-bound, bound) +
+    geom_line(colour = 'purple') +
+    geom_hline(yintercept = 0) +
+    geom_vline(xintercept = 0)
+
+print(g)
+
+```
