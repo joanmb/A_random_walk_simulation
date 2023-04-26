@@ -3,10 +3,38 @@ title: "A random walk simulation"
 output: html_notebook
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduction
+
+Our goal in the next lines is to simulate some of the most simple but also important stochastic processes. We focus on simulating a simple random walk.
+
+A random walk is a random process that describes a path that consists of a succession of random steps on some mathematical space.
+
+### The Simple Random Walk
+
+More formally, we can define:
+
+Let $\{X_i\}_{i \ge 1}$ be a succession of identically distributed independent random variables with $P(X_i = 1) = p$ and $P(X_i = -1) = 1-p$. Then, the process $\{S_n\}_{n \ge 0}$ defined by:
+$$S_n = S_0 + \sum_{i=1}^{n} X_i,$$
+where $S_0$ is a constant, is called a **simple random walk** with parameter $p \in (0,1)$.
+
+Notice that here the word *'simple'* means that the location can only jump to neighboring sites. In general, this is not the case.
+
+We say that the random walk is **symmetric** if $p = 1/2$.
+
+### The Simulation
+
+To be able to simulate this process we must first know how to simulate $X_i$ values. We can do this from the [Bernoulli random variables](https://en.wikipedia.org/wiki/Bernoulli_distribution) simulations.
+
+The following function generates a trajectory of length $n$ of the process $S$.
+The values by default are $p = 1/2$,  $n = 100$ and $S_0 = 0$. Notice that it returns a *dataframe* object with the first column $\{i\}_{i=0,\dots,n}$ and the second one $\{S_i\}_{i=0,\dots,n}$:
 
 
-```{r}
-RW<-function(p = 0.5, n = 100, S0 = 0){
+```{r SRW, echo = TRUE}
+SRW<-function(p = 0.5, n = 100, S0 = 0){
     X <- rbinom(n, 1, p)
     X <- X - 1 * (X == 0)
     S <- cumsum(c(S0, X))
@@ -15,19 +43,36 @@ RW<-function(p = 0.5, n = 100, S0 = 0){
 ```
 
 
-```{r}
+An example of the *dataframe* that our function returns with $p = 1/2$, $n = 15$ and $S_0 = 10$:
+
+
+```{r SRW example, echo = TRUE}
+SRW(n = 15, S0 =10)
+```
+
+
+### A plot of a Simple Random Walk
+
+
+The following instruction draws a trajectory of a random walk with $p = 1/2$, $n = 200$ and $S_0 = 0$:
+
+
+```{r SRW plot}
 library(ggplot2)
 
-df <- RW(n = 200)
+df <- SRW(n = 200)
 
 bound <- max(abs(max(df[2])), abs(min(df[2]))) # In order to center the drawing
     
 g<- ggplot(df, aes(n, S)) +
     geom_point(size = 0.5, colour = 'blue') +
+    labs(x = "n", y = "S  values") +
     ylim(-bound, bound) +
     geom_line(colour = 'purple') +
     geom_hline(yintercept = 0) +
-    geom_vline(xintercept = 0)
+    geom_vline(xintercept = 0) +
+    facet_grid(~"The path of a Simple Random Walk") +
+    theme_bw()
 
 print(g)
 
