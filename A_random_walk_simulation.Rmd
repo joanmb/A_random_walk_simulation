@@ -33,7 +33,7 @@ The following function generates a trajectory of length $n$ of the process $S$.
 The values by default are $p = 1/2$,  $n = 100$ and $S_0 = 0$. Notice that it returns a *dataframe* object with the first column $\{i\}_{i=0,\dots,n}$ and the second one $\{S_i\}_{i=0,\dots,n}$:
 
 
-```{r SRW, echo = TRUE}
+```{r SRW}
 SRW<-function(p = 0.5, n = 100, S0 = 0){
     X <- rbinom(n, 1, p)
     X <- X - 1 * (X == 0)
@@ -68,12 +68,54 @@ g<- ggplot(df, aes(n, S)) +
     geom_point(size = 0.5, colour = 'blue') +
     labs(x = "n", y = "S  values") +
     ylim(-bound, bound) +
-    geom_line(colour = 'purple') +
-    geom_hline(yintercept = 0) +
-    geom_vline(xintercept = 0) +
+    geom_line(colour = 'purple', show.legend = TRUE) +
+    geom_hline(yintercept = 0, show.legend = TRUE) +
+    geom_vline(xintercept = 0, show.legend = TRUE) +
     facet_grid(~"The path of a Simple Random Walk") +
     theme_bw()
 
 print(g)
-
 ```
+
+### A couple of variables: $\tau$ and $\gamma$
+
+We suppose now that $S$ is a simple random walk with $S_0 = 0$ and that we simulate $S$ from $0$ to $n$. Then we define the variables:
+$$\tau := {\arg \max}_{0 \le k \le n}S_k,$$
+$$\gamma := \max_{0 \le k \le n}\{S_k = 0\}.$$
+
+That is to say, the instant of time when $S$ reaches its maximum and the last instant of time where it is zero, respectively.
+
+Notice that we have defined $\gamma$ supposing $S_0 = 0$. We could also define it in a more general sense as $\gamma := \max_{0 \le k \le n}\{S_k = S_0\}$, but in fact is the same, just applying a translation to all the values of $S$.
+
+Let's gonna calculate the values of $\tau$ and $\gamma$ for the random walk we have just plotted.
+
+```{r tau}
+tau_vect <- which(df['S'] == max(df['S']))
+tau <- tail(tau_vect, n = 1) - 1
+tau
+```
+
+```{r gamma}
+gamma_vect <- which(df['S'] == df[1,2])
+gamma <- tail(gamma_vect, n = 1) - 1
+gamma
+```
+
+In the chart below we can see these values, $\tau$ in **black** and <span style="color:red">$\gamma$</span> in <span style="color:red">**red**</span>: 
+
+```{r SRW plot with tau and gamma}
+g_tau_gamma <- g +
+    geom_point(aes(x = tau, y = df[tau + 1, 2]), colour="black", size = 2.7) +
+    geom_point(aes(x = tau, y = 0), colour="black", size = 2.7, shape = 4) +
+    geom_segment(aes(x = tau, y = 0, xend = tau, yend = df[tau + 1, 2]),
+                 linetype = "dotted", size = 0.2) +
+    geom_point(aes(x = gamma, y = df[gamma + 1, 2]), colour="red", size = 2.7) +
+    facet_grid(~"The path of a Simple Random Walk with Tau and Gamma")
+
+print(g_tau_gamma)
+```
+
+
+
+
+######### ... to be continued.
