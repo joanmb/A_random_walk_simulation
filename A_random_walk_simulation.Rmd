@@ -34,7 +34,7 @@ The values by default are $p = 1/2$,  $n = 100$ and $S_0 = 0$. Notice that it re
 
 
 ```{r SRW}
-SRW<-function(p = 0.5, n = 100, S0 = 0){
+SRW <- function(p = 0.5, n = 100, S0 = 0){
     X <- rbinom(n, 1, p)
     X <- X - 1 * (X == 0)
     S <- cumsum(c(S0, X))
@@ -47,7 +47,7 @@ An example of the *dataframe* that our function returns with $p = 1/2$, $n = 15$
 
 
 ```{r SRW example, echo = TRUE}
-SRW(n = 15, S0 =10)
+SRW(n = 15, S0 = 10)
 ```
 
 
@@ -64,7 +64,7 @@ df <- SRW(n = 200)
 
 bound <- max(abs(max(df[2])), abs(min(df[2]))) # In order to center the drawing
     
-g<- ggplot(df, aes(n, S)) +
+g <- ggplot(df, aes(n, S)) +
     geom_point(size = 0.5, colour = 'blue') +
     labs(x = "n", y = "S  values") +
     ylim(-bound, bound) +
@@ -90,30 +90,72 @@ Notice that we have defined $\gamma$ supposing $S_0 = 0$. We could also define i
 Let's gonna calculate the values of $\tau$ and $\gamma$ for the random walk we have just plotted.
 
 ```{r tau}
-tau_vect <- which(df['S'] == max(df['S']))
-tau <- tail(tau_vect, n = 1) - 1
-tau
+tau <- function(data_frame){
+    tau_vect <- which(data_frame['S'] == max(data_frame['S']))
+    tau <- tail(tau_vect, n = 1) - 1
+    return(tau)
+}
+tau(df)
 ```
 
 ```{r gamma}
-gamma_vect <- which(df['S'] == df[1,2])
-gamma <- tail(gamma_vect, n = 1) - 1
-gamma
+gamma <- function(data_frame){
+    gamma_vect <- which(data_frame['S'] == data_frame[1,2])
+    gamma <- tail(gamma_vect, n = 1) - 1
+    return(gamma)
+}
+gamma(df)
 ```
 
 In the chart below we can see these values, $\tau$ in **black** and <span style="color:red">$\gamma$</span> in <span style="color:red">**red**</span>: 
 
 ```{r SRW plot with tau and gamma}
 g_tau_gamma <- g +
-    geom_point(aes(x = tau, y = df[tau + 1, 2]), colour="black", size = 2.7) +
-    geom_point(aes(x = tau, y = 0), colour="black", size = 2.7, shape = 4) +
-    geom_segment(aes(x = tau, y = 0, xend = tau, yend = df[tau + 1, 2]),
+    geom_point(aes(x = tau(df), y = df[tau(df) + 1, 2]), colour="black", size = 2.7) +
+    geom_point(aes(x = tau(df), y = 0), colour="black", size = 2.7, shape = 4) +
+    geom_segment(aes(x = tau(df), y = 0, xend = tau(df), yend = df[tau(df) + 1, 2]),
                  linetype = "dotted", size = 0.2) +
-    geom_point(aes(x = gamma, y = df[gamma + 1, 2]), colour="red", size = 2.7) +
+    geom_point(aes(x = gamma(df), y = df[gamma(df) + 1, 2]), colour="red", size = 2.7) +
     facet_grid(~"The path of a Simple Random Walk with Tau and Gamma")
 
 print(g_tau_gamma)
 ```
+
+
+### Using $\tau$ and $\gamma$ 
+
+```{r tau gamma dataframe}
+m <- 10000
+n <- 200
+df_tau_gamma <- data.frame(tau = 1:m, gamma = 1:m, tau_norm = 0, gamma_norm = 0)
+
+for(i in 1:m){
+    aux <- SRW(n = n, S0 = 0)
+    df_tau_gamma[i,1] <- tau(aux)
+    df_tau_gamma[i,2] <- gamma(aux)
+    df_tau_gamma[i,3] <- df_tau_gamma[i,1]/n
+    df_tau_gamma[i,4] <- df_tau_gamma[i,2]/n
+}
+head(df_tau_gamma)
+```
+
+```{r histogram tau}
+hist_tau <- ggplot(df_tau_gamma, aes(x = tau_norm)) + 
+    geom_histogram()
+
+print(hist_tau)
+```
+
+```{r histogram gamma}
+hist_gamma <- ggplot(df_tau_gamma, aes(x = gamma_norm)) + 
+    geom_histogram()
+
+print(hist_gamma)
+```
+
+
+
+
 
 
 
