@@ -122,7 +122,11 @@ print(g_tau_gamma)
 ```
 
 
-### Using $\tau$ and $\gamma$ 
+### Using $\tau$ and $\gamma$
+
+Now, let's gonna do some interpretation about these variables. We write a code to generate 10000 observations of each of these variables. Afterwards, we gonna normalize these values considering $\tau / n$ and $\gamma / n$. Finally, we gonna make an histogram of the normalized variables.
+
+In order to do this, we gonna construct a new dataframe: 
 
 ```{r tau gamma dataframe}
 m <- 10000
@@ -139,16 +143,24 @@ for(i in 1:m){
 head(df_tau_gamma)
 ```
 
+Let's plot now the two histograms:
+
 ```{r histogram tau}
 hist_tau <- ggplot(df_tau_gamma, aes(x = tau_norm)) + 
-    geom_histogram()
+    geom_histogram(binwidth = 0.025, fill="#69b3a2", color="#e9ecef", alpha=0.8) +
+    labs(x = "tau/n values", y = "Count") +
+    facet_grid(~"tau / n") +
+    theme_bw()
 
 print(hist_tau)
 ```
 
 ```{r histogram gamma}
 hist_gamma <- ggplot(df_tau_gamma, aes(x = gamma_norm)) + 
-    geom_histogram()
+    geom_histogram(binwidth = 0.025, fill="#FF0033", color="#e9ecef", alpha=0.8) +
+    labs(x = "gamma/n values", y = "Count") +
+    facet_grid(~"gamma / n") +
+    theme_bw()
 
 print(hist_gamma)
 ```
