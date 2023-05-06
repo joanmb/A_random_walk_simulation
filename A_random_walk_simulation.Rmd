@@ -1,5 +1,5 @@
 ---
-title: "A random walk simulation"
+title: "A random walk simulation and the Arcsine distribution"
 output: html_notebook
 ---
 
@@ -68,9 +68,9 @@ g <- ggplot(df, aes(n, S)) +
     geom_point(size = 0.5, colour = 'blue') +
     labs(x = "n", y = "S  values") +
     ylim(-bound, bound) +
-    geom_line(colour = 'purple', show.legend = TRUE) +
-    geom_hline(yintercept = 0, show.legend = TRUE) +
-    geom_vline(xintercept = 0, show.legend = TRUE) +
+    geom_line(colour = 'purple') +
+    geom_hline(yintercept = 0) +
+    geom_vline(xintercept = 0) +
     facet_grid(~"The path of a Simple Random Walk") +
     theme_bw()
 
@@ -124,19 +124,20 @@ print(g_tau_gamma)
 
 ### Using $\tau$ and $\gamma$
 
-Now, let's gonna do some interpretation about these variables. We write a code to generate 10000 observations of each of these variables. Afterwards, we gonna normalize these values considering $\tau / n$ and $\gamma / n$. Finally, we gonna make an histogram of the normalized variables.
+Now, let's gonna do some interpretations about these variables. We write a code to generate 10000 observations of each of these variables. Afterwards, we gonna normalize these values considering $\tau / n$ and $\gamma / n$. Finally, we gonna make a couple of histograms of the normalized variables.
 
 In order to do this, we gonna construct a new dataframe: 
 
 ```{r tau gamma dataframe}
 m <- 10000
-n <- 200
+n <- 222
 df_tau_gamma <- data.frame(tau = 1:m, gamma = 1:m, tau_norm = 0, gamma_norm = 0)
 
 for(i in 1:m){
-    aux <- SRW(n = n, S0 = 0)
-    df_tau_gamma[i,1] <- tau(aux)
-    df_tau_gamma[i,2] <- gamma(aux)
+    df_aux <- SRW(n = n, S0 = 0)
+    
+    df_tau_gamma[i,1] <- tau(df_aux)
+    df_tau_gamma[i,2] <- gamma(df_aux)
     df_tau_gamma[i,3] <- df_tau_gamma[i,1]/n
     df_tau_gamma[i,4] <- df_tau_gamma[i,2]/n
 }
@@ -147,9 +148,9 @@ Let's plot now the two histograms:
 
 ```{r histogram tau}
 hist_tau <- ggplot(df_tau_gamma, aes(x = tau_norm)) + 
-    geom_histogram(binwidth = 0.025, fill="#69b3a2", color="#e9ecef", alpha=0.8) +
+    geom_histogram(binwidth = 0.025, fill="#69b3a2", color="black", alpha=0.8) +
     labs(x = "tau/n values", y = "Count") +
-    facet_grid(~"tau / n") +
+    facet_grid(~"tau / n histogram") +
     theme_bw()
 
 print(hist_tau)
@@ -157,17 +158,49 @@ print(hist_tau)
 
 ```{r histogram gamma}
 hist_gamma <- ggplot(df_tau_gamma, aes(x = gamma_norm)) + 
-    geom_histogram(binwidth = 0.025, fill="#FF0033", color="#e9ecef", alpha=0.8) +
+    geom_histogram(binwidth = 0.025, fill="yellow", color="black", alpha=0.8) +
     labs(x = "gamma/n values", y = "Count") +
-    facet_grid(~"gamma / n") +
+    facet_grid(~"gamma / n histogram") +
     theme_bw()
 
 print(hist_gamma)
 ```
 
+### The Arcsine distribution
 
+At this point, the shape of these two histograms may be familiar to one. Indeed, they are really similar to the density function of an arcsine distribution:
 
+The **arcsine distribution** is the probability distribution whose probability density function is:
+$$f(x) = \frac{1}{\pi \sqrt{x(1-x)}}\cdot\mathbb{1}_{(0,1)}(x)$$
+Finally, we gonna a paint this function over each one of the histograms:
 
+```{r histogram tau arcsine}
+library(VaRES)
+
+hist_tau_arcsine <- ggplot(df_tau_gamma, aes(x = tau_norm)) + 
+    geom_histogram(aes(y =..density..),
+                   binwidth = 0.025, fill="#69b3a2", color="black", alpha=0.8) +
+    labs(x = "tau/n values", y = "Count") +
+    facet_grid(~"tau / n histogram") +
+    theme_bw() +
+    geom_density(colour = "#FF0033", size = 1) +
+    stat_function(aes(x = tau_norm), fun = darcsine, geom="line", colour = "purple", size = 1)
+
+print(hist_tau_arcsine)
+```
+```{r histogram gamma arcsine}
+hist_gamma_arcsine <- ggplot(df_tau_gamma, aes(x = gamma_norm)) + 
+    geom_histogram(aes(y =..density..),
+                   binwidth = 0.025, fill="yellow", color="black", alpha=0.8) +
+    labs(x = "gamma/n values", y = "Count") +
+    facet_grid(~"gamma / n histogram") +
+    theme_bw() +
+    geom_density(colour = "#FF0033", size = 1.1) +
+    stat_function(aes(x = gamma_norm), fun = darcsine, geom="line",
+                  colour = "purple", size = 1.1)
+
+print(hist_gamma_arcsine)
+```
 
 
 
