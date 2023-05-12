@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Introduction
 
-Our goal in the next lines is to simulate some of the most simple but also important stochastic processes. We focus on simulating a simple random walk.
+Our goal in the next lines is to simulate some of the most simple but also important stochastic processes. We focus on simulating a simple random walk and we gonna see a curious relation of it with the Arcsine distribution.
 
 A random walk is a random process that describes a path that consists of a succession of random steps on some mathematical space.
 
@@ -172,7 +172,10 @@ At this point, the shape of these two histograms may be familiar to one. Indeed,
 
 The **arcsine distribution** is the probability distribution whose probability density function is:
 $$f(x) = \frac{1}{\pi \sqrt{x(1-x)}}\cdot\mathbb{1}_{(0,1)}(x)$$
-Finally, we gonna a paint this function over each one of the histograms:
+Finally, we gonna paint this function over each one of the histograms:
+
+- In <span style="color:purple">**purple**</span> the density function of the Arcsine distribution.
+- In <span style="color:red">**red**</span> the [KDE](https://en.wikipedia.org/wiki/Kernel_density_estimation) from the histograms, to compare.
 
 ```{r histogram tau arcsine}
 library(VaRES)
@@ -180,8 +183,8 @@ library(VaRES)
 hist_tau_arcsine <- ggplot(df_tau_gamma, aes(x = tau_norm)) + 
     geom_histogram(aes(y =..density..),
                    binwidth = 0.025, fill="#69b3a2", color="black", alpha=0.8) +
-    labs(x = "tau/n values", y = "Count") +
-    facet_grid(~"tau / n histogram") +
+    labs(x = "tau/n values", y = "Frequency") +
+    facet_grid(~"tau / n histogram with densities") +
     theme_bw() +
     geom_density(colour = "#FF0033", size = 1) +
     stat_function(aes(x = tau_norm), fun = darcsine, geom="line", colour = "purple", size = 1)
@@ -192,8 +195,8 @@ print(hist_tau_arcsine)
 hist_gamma_arcsine <- ggplot(df_tau_gamma, aes(x = gamma_norm)) + 
     geom_histogram(aes(y =..density..),
                    binwidth = 0.025, fill="yellow", color="black", alpha=0.8) +
-    labs(x = "gamma/n values", y = "Count") +
-    facet_grid(~"gamma / n histogram") +
+    labs(x = "gamma/n values", y = "Frequency") +
+    facet_grid(~"gamma / n histogram with densities") +
     theme_bw() +
     geom_density(colour = "#FF0033", size = 1.1) +
     stat_function(aes(x = gamma_norm), fun = darcsine, geom="line",
@@ -201,8 +204,3 @@ hist_gamma_arcsine <- ggplot(df_tau_gamma, aes(x = gamma_norm)) +
 
 print(hist_gamma_arcsine)
 ```
-
-
-
-
-######### ... to be continued.
