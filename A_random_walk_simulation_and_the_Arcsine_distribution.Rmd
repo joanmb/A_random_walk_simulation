@@ -1,5 +1,6 @@
 ---
 title: "A random walk simulation and the Arcsine distribution"
+author: Joan Marine-Boada
 output: html_notebook
 ---
 
